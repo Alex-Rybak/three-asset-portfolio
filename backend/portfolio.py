@@ -23,23 +23,24 @@ class Portfolio:
         mean_return = 0
         for asset in assets:
             weight = ptf[asset]/total_weight
-            mean_return += get_pct_change(assets).mean() * weight
+            mean_return += get_pct_change(asset).mean(numeric_only=True)[asset] * weight
         return mean_return
 
     def get_risk(self):
         ptf = self.ptf
-        assets = ptf.keys()
+        assets = list(ptf.keys())
         total_weight = sum(list(ptf.values()))
         vol_vect = []
 
         for asset in assets:
             weight = ptf[asset]/total_weight
-            st_dev = get_pct_change(asset).std()
+            st_dev = get_pct_change(asset).std(numeric_only=True)[asset]
             vol_vect.append(weight*st_dev)
 
         vol_vect = np.array(vol_vect)
 
         asset_changes = get_pct_change(assets)
+        #print(asset_changes)
         cor_mat = asset_changes.corr(method='pearson').to_numpy()
 
         st_dev = ( np.dot(vol_vect,np.dot(cor_mat,np.transpose(vol_vect))) ) ** 0.5
